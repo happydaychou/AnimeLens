@@ -85,24 +85,49 @@
       </div>
     </section>
 
-    <section class="relative mx-auto max-w-5xl">
+    <section class="relative mx-auto max-w-3xl">
       <div class="absolute -right-4 -top-8 z-20 rotate-6 bg-white px-4 py-2 text-sm font-black uppercase text-black shadow-hard">Evidence // image file</div>
-      <div id="drop-zone" class="calling-card group cursor-pointer -rotate-2 border-4 border-black bg-red-600 p-3 shadow-card transition-all duration-300 hover:-translate-y-2 hover:rotate-0 hover:shadow-cardHover focus-within:-translate-y-2 focus-within:rotate-0">
-        <div class="border-4 border-black bg-red-600 px-6 py-14 text-center md:px-16 md:py-24">
+      <div id="drop-zone" class="calling-card group relative cursor-pointer -rotate-2 border-4 border-black bg-red-600 p-2 shadow-card transition-all duration-300 hover:-translate-y-2 hover:rotate-0 hover:shadow-cardHover focus-within:-translate-y-2 focus-within:rotate-0 sm:p-3">
+        <div class="relative overflow-visible border-4 border-black bg-red-600 px-4 py-10 text-center md:px-8 md:py-14">
           <input id="file-input" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" class="hidden" />
-          <div class="mx-auto mb-8 max-w-3xl text-[clamp(2rem,6vw,5rem)] font-black uppercase leading-[.82] tracking-[-.1em] text-black">
-            <span class="mr-2 inline-block -rotate-2 bg-white px-3 py-2 shadow-hard">把</span>
-            <span class="mr-2 inline-block rotate-1 bg-black px-3 py-2 text-white shadow-hard">番</span>
-            <span class="mr-2 inline-block -rotate-1 bg-white px-3 py-2 shadow-hard">剧</span>
-            <span class="mr-2 inline-block rotate-2 bg-black px-3 py-2 text-white shadow-hard">截</span>
-            <span class="mr-2 inline-block -rotate-2 bg-white px-3 py-2 shadow-hard">图</span>
-            <span class="mr-2 inline-block rotate-1 bg-black px-3 py-2 text-white shadow-hard">拖</span>
-            <span class="mr-2 inline-block -rotate-1 bg-white px-3 py-2 shadow-hard">到</span>
-            <span class="mr-2 inline-block rotate-2 bg-black px-3 py-2 text-white shadow-hard">这</span>
-            <span class="mr-2 inline-block -rotate-2 bg-white px-3 py-2 shadow-hard">里</span>
+
+          <div class="fragment-command pointer-events-none group absolute -left-40 top-[12%] z-20 hidden h-14 w-60 rotate-12 md:flex items-center justify-center" aria-hidden="true" style="clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%, 15% 50%);">
+            <span class="absolute inset-0 bg-red-600 transition-transform duration-100 ease-linear group-hover:-translate-x-1 group-hover:-translate-y-1" style="clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%, 15% 50%);"></span>
+            <span class="absolute inset-0 -translate-x-1 -translate-y-1 bg-black transition-transform duration-100 ease-linear group-hover:-translate-x-3 group-hover:-translate-y-2" style="clip-path: polygon(0% 0%, 85% 0%, 100% 50%, 85% 100%, 0% 100%, 15% 50%);"></span>
+            <span class="relative z-10 inline-block -rotate-1 text-lg font-black uppercase tracking-tight text-white transition-transform duration-100 ease-linear group-hover:scale-105">Paste URL</span>
           </div>
-          <p class="mx-auto max-w-2xl border-y-4 border-black py-4 text-lg font-black uppercase text-black md:text-2xl">或者点击上传 // 也可以直接粘贴截图</p>
-          <div class="mt-8 flex flex-wrap justify-center gap-3 text-xs font-black uppercase text-black">
+
+          <div class="fragment-command pointer-events-none group absolute -bottom-2 -left-40 z-20 hidden h-24 w-64 -rotate-[10deg] md:flex items-center justify-center" aria-hidden="true" style="clip-path: polygon(0% 25%, 75% 25%, 75% 5%, 100% 50%, 75% 95%, 75% 75%, 0% 75%, 15% 50%);">
+            <span class="absolute inset-0 bg-red-600 transition-transform duration-100 ease-linear group-hover:-translate-x-1 group-hover:translate-y-1" style="clip-path: polygon(0% 25%, 75% 25%, 75% 5%, 100% 50%, 75% 95%, 75% 75%, 0% 75%, 15% 50%);"></span>
+            <span class="absolute inset-0 -translate-x-1 translate-y-1 bg-black transition-transform duration-100 ease-linear group-hover:-translate-x-3 group-hover:translate-y-2" style="clip-path: polygon(0% 25%, 75% 25%, 75% 5%, 100% 50%, 75% 95%, 75% 75%, 0% 75%, 15% 50%);"></span>
+            <span class="relative z-10 inline-block rotate-1 text-base font-black uppercase tracking-tight text-white transition-transform duration-100 ease-linear group-hover:scale-105">Search History</span>
+          </div>
+
+          <div class="fragment-command pointer-events-none group absolute -right-28 top-[20%] z-20 hidden h-14 w-44 rotate-12 md:flex items-center justify-center" aria-hidden="true" style="clip-path: polygon(14% 0, 100% 18%, 100% 82%, 14% 100%, 0 50%);">
+            <span class="absolute inset-0 bg-red-600 transition-transform duration-100 ease-linear group-hover:translate-x-1 group-hover:-translate-y-1" style="clip-path: polygon(14% 0, 100% 18%, 100% 82%, 14% 100%, 0 50%);"></span>
+            <span class="absolute inset-0 translate-x-1 -translate-y-1 bg-black transition-transform duration-100 ease-linear group-hover:translate-x-3 group-hover:-translate-y-2" style="clip-path: polygon(14% 0, 100% 18%, 100% 82%, 14% 100%, 0 50%);"></span>
+            <span class="relative z-10 inline-block rotate-1 text-lg font-black uppercase tracking-tight text-white transition-transform duration-100 ease-linear group-hover:scale-105">Sign in </span>
+          </div>
+
+          <div class="fragment-command pointer-events-none group absolute -bottom-2 -right-20 z-20 hidden h-12 w-44 -rotate-5 md:flex items-center justify-center" aria-hidden="true" style="clip-path: polygon(14% 0, 100% 18%, 100% 82%, 14% 100%, 0 50%);">
+            <span class="absolute inset-0 bg-red-600 transition-transform duration-100 ease-linear group-hover:translate-x-1 group-hover:translate-y-1" style="clip-path: polygon(14% 0, 100% 18%, 100% 82%, 14% 100%, 0 50%);"></span>
+            <span class="absolute inset-0 translate-x-1 translate-y-1 bg-black transition-transform duration-100 ease-linear group-hover:translate-x-3 group-hover:translate-y-2" style="clip-path: polygon(14% 0, 100% 18%, 100% 82%, 14% 100%, 0 50%);"></span>
+            <span class="relative z-10 inline-block -rotate-1 text-lg font-black uppercase tracking-tight text-white transition-transform duration-100 ease-linear group-hover:scale-105">Register</span>
+          </div>
+
+          <div class="relative z-10 mx-auto max-w-2xl text-[clamp(2rem,6vw,4.5rem)] font-black uppercase leading-[.82] tracking-[-.1em] text-black">
+            <span class="mr-1 inline-block -rotate-2 bg-white px-2 py-2 shadow-hard sm:mr-2 sm:px-3">把</span>
+            <span class="mr-1 inline-block rotate-1 bg-black px-2 py-2 text-white shadow-hard sm:mr-2 sm:px-3">番</span>
+            <span class="mr-1 inline-block -rotate-1 bg-white px-2 py-2 shadow-hard sm:mr-2 sm:px-3">剧</span>
+            <span class="mr-1 inline-block rotate-2 bg-black px-2 py-2 text-white shadow-hard sm:mr-2 sm:px-3">截</span>
+            <span class="mr-1 inline-block -rotate-2 bg-white px-2 py-2 shadow-hard sm:mr-2 sm:px-3">图</span>
+            <span class="mr-1 inline-block rotate-1 bg-black px-2 py-2 text-white shadow-hard sm:mr-2 sm:px-3">拖</span>
+            <span class="mr-1 inline-block -rotate-1 bg-white px-2 py-2 shadow-hard sm:mr-2 sm:px-3">到</span>
+            <span class="mr-1 inline-block rotate-2 bg-black px-2 py-2 text-white shadow-hard sm:mr-2 sm:px-3">这</span>
+            <span class="inline-block -rotate-2 bg-white px-2 py-2 shadow-hard sm:px-3">里</span>
+          </div>
+          <p class="relative z-10 mx-auto mt-7 max-w-2xl border-y-4 border-black py-3 text-base font-black uppercase text-black sm:text-lg md:text-xl">或者点击上传 // 也可以直接粘贴截图</p>
+          <div class="relative z-10 mt-6 flex flex-wrap justify-center gap-3 text-xs font-black uppercase text-black">
             <span class="bg-white px-4 py-2 shadow-hard">JPG / PNG</span>
             <span class="bg-black px-4 py-2 text-white shadow-hard">MAX 10MB</span>
             <span class="bg-white px-4 py-2 shadow-hard">SECURE FILE</span>
@@ -127,7 +152,7 @@
     </section>
   </main>
 
-  <div class="joker-mascot pointer-events-none fixed bottom-0 right-0 z-30 w-56 md:w-80" aria-label="怪盗吉祥物占位">
+  <div class="joker-mascot pointer-events-none fixed bottom-2 right-0 z-30 w-56 md:w-[450px]" aria-label="怪盗吉祥物占位">
     <img src="/static/joker.png" alt="Joker" class="h-auto w-full drop-shadow-[12px_12px_0_rgba(220,38,38,1)]" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')" />
     <div class="hidden border-4 border-black bg-white p-4 text-center text-black shadow-hard"><span class="text-3xl">?</span><br /><span class="text-xs font-black uppercase">joker.png not found</span></div>
   </div>
@@ -145,6 +170,36 @@
     function clearError() { errorMessage.classList.add('hidden'); errorMessage.textContent = ''; }
     function setLoading(active) { loading.classList.toggle('hidden', !active); dropZone.classList.toggle('hidden', active); if (active) resultsSection.classList.add('hidden'); }
     function renderResults(results) { resultsGrid.innerHTML = results.map((result) => `<article class="border-4 border-black bg-white p-5 text-black shadow-hard"><h3 class="text-2xl font-black uppercase">${String(result.title || '未知动漫')}</h3><p class="mt-2 font-black">${result.description || ''}</p></article>`).join(''); resultsSection.classList.remove('hidden'); }
+    
+    // function renderResults(results) {
+    //   resultsGrid.innerHTML = '';
+    //   if (!results.length) { resultsGrid.innerHTML = '<div class="col-span-full rounded-2xl border border-sky-100 bg-white p-10 text-center font-semibold text-slate-400 shadow-sm">没有找到匹配结果，换一张更清晰的截图试试吧。</div>'; resultsSection.classList.remove('hidden'); return; }
+    //   results.forEach((result) => {
+    //     const score = typeof result.similarity === 'number' ? (result.similarity <= 1 ? result.similarity * 100 : result.similarity) : 0;
+    //     const highScore = score >= 85;
+    //     const confidenceTone = confidenceClass(score);
+    //     const title = getName(result.title);
+    //     const engine = result.engine || 'tracemoe';
+    //     const subtitle = typeof result.title === 'object' ? [result.title?.romaji, result.title?.native].filter((name) => name && name !== title).join(' · ') : '';
+    //     const fallbackUrl = currentImageUrl || '';
+    //     const primaryImage = result.image_url || result.thumbnail_url || fallbackUrl;
+    //     const fallbackAttribute = fallbackUrl && primaryImage !== fallbackUrl ? `data-fallback="${escapeHtml(fallbackUrl)}"` : '';
+    //     const imageMarkup = result.video_url
+    //       ? `<video class="h-full w-full object-cover" controls preload="metadata" playsinline src="${escapeHtml(result.video_url)}" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')"></video><div class="hidden absolute inset-0">${fallbackUrl ? `<img class="h-full w-full object-cover" src="${escapeHtml(fallbackUrl)}" alt="${escapeHtml(title)} 原图" />` : '<div class="grid h-full place-items-center bg-slate-200 px-6 text-center text-sm font-semibold text-slate-500">视频预览暂时无法加载</div>'}</div>`
+    //       : primaryImage
+    //         ? `<img class="h-full w-full object-cover" src="${escapeHtml(primaryImage)}" ${fallbackAttribute} alt="${escapeHtml(title)} 识别图片" loading="lazy" onerror="this.dataset.fallback && this.src !== this.dataset.fallback ? (this.src = this.dataset.fallback) : (this.onerror = null, this.classList.add('hidden'), this.nextElementSibling.classList.remove('hidden'))"><div class="hidden absolute inset-0 grid place-items-center bg-slate-200/90 px-6 text-center text-sm font-semibold text-slate-500"><span>图片预览暂时无法加载<br><span class="mt-1 inline-block text-xs font-normal text-slate-400">仍然可以参考下方识别信息</span></span></div>`
+    //         : '<div class="absolute inset-0 grid place-items-center bg-slate-200 px-6 text-center text-sm font-semibold text-slate-500"><span>暂无图片预览<br><span class="mt-1 inline-block text-xs font-normal text-slate-400">仍然可以参考下方识别信息</span></span></div>';
+    //     const visionDetails = engine === 'ai_vision' && (result.character || result.description)
+    //       ? `<div class="mt-4 rounded-xl border border-violet-100 bg-violet-50/70 p-3"><p class="text-[11px] font-black uppercase tracking-[.15em] text-violet-500">AI 识别细节</p>${result.character ? `<p class="mt-2 text-sm font-bold text-slate-700">角色：${escapeHtml(result.character)}</p>` : ''}${result.description ? `<p class="mt-1 text-xs leading-5 text-slate-500">${escapeHtml(result.description)}</p>` : ''}</div>`
+    //       : '';
+    //     const card = document.createElement('article');
+    //     card.className = 'overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg';
+    //     card.innerHTML = `<div class="relative aspect-video overflow-hidden bg-sky-50">${imageMarkup}<div class="absolute left-3 top-3 rounded-full border px-3 py-1 text-xs font-black shadow-sm backdrop-blur ${confidenceTone}">${score.toFixed(1)}% 置信度</div><div class="absolute right-3 top-3 rounded-full border px-2.5 py-1 text-[11px] font-bold shadow-sm backdrop-blur ${engineClass(engine)}">${engineLabel(engine)}</div></div><div class="p-5"><h3 class="line-clamp-2 text-lg font-black text-slate-800">${escapeHtml(title)}</h3><p class="mt-1 min-h-5 text-xs text-slate-400">${escapeHtml(subtitle)}</p>${visionDetails}<div class="mt-5 grid grid-cols-2 gap-3 text-sm"><div class="rounded-xl bg-sky-50 p-3"><p class="text-[11px] font-semibold text-sky-500">集数</p><p class="mt-1 font-bold text-slate-700">${result.episode ? `第 ${escapeHtml(result.episode)} 集` : '未知'}</p></div><div class="rounded-xl bg-pink-50 p-3"><p class="text-[11px] font-semibold text-pink-500">画面时间</p><p class="mt-1 font-bold text-slate-700">${formatTime(result.from)} - ${formatTime(result.to)}</p></div></div></div>`;
+    //     resultsGrid.appendChild(card);
+    //   });
+    //   resultsSection.classList.remove('hidden');
+    // }
+    
 
     async function search(file) {
       clearError();
