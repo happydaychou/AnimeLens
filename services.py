@@ -4,6 +4,8 @@ import base64
 import json
 import math
 import re
+from abc import ABC, abstractmethod
+from contextvars import ContextVar
 from typing import Any
 
 import httpx
@@ -13,6 +15,7 @@ from config import (
     ANILIST_TITLE_CACHE,
     SAUCENAO_API_KEY,
     SAUCENAO_URL,
+    TRACE_CONFIDENCE_THRESHOLD,
     TRACE_MOE_URL,
     VISION_API_KEY,
     VISION_BASE_URL,
@@ -20,6 +23,32 @@ from config import (
     logger,
 )
 from schemas import SearchResult, UpstreamSearchError
+
+
+# Frame counts are request-scoped metadata rather than mutable engine state.  This
+# keeps the shared chain safe when FastAPI handles multiple uploads concurrently.
+_trace_frame_count: ContextVar[int | None] = ContextVar(
+    "trace_frame_count", default=None
+)
+_chain_terminal_error: ContextVar[UpstreamSearchError | None] = ContextVar(
+    "chain_terminal_error", default=None
+)
+
+
+def reset_search_context() -> None:
+    """Clear request-scoped metadata before starting a new search request."""
+    _trace_frame_count.set(None)
+    _chain_terminal_error.set(None)
+
+
+def get_trace_frame_count() -> int | None:
+    """Return the frame count captured by the current request's Trace.moe call."""
+    return _trace_frame_count.get()
+
+
+def get_chain_terminal_error() -> UpstreamSearchError | None:
+    """Return an error raised by the final chain node, if any."""
+    return _chain_terminal_error.get()
 
 
 async def _fetch_anilist_cover(
@@ -379,7 +408,9 @@ async def _request_tracemoe(
         raise UpstreamSearchError("Trace.moe request failed") from exc
 
     results = await _clean_trace_results(client, payload.get("result", []))
-    return results, payload.get("frameCount")
+    frame_count = payload.get("frameCount")
+    _trace_frame_count.set(frame_count if isinstance(frame_count, int) else None)
+    return results, frame_count
 
 
 async def _request_saucenao(
@@ -413,3 +444,135 @@ async def _request_saucenao(
         for result in [_clean_saucenao_result(item)]
         if result is not None
     ]
+
+
+class BaseSearchEngine(ABC):
+    """Template for one node in the anime recognition responsibility chain."""
+
+    def __init__(self) -> None:
+        self._next_engine: BaseSearchEngine | None = None
+
+    def set_next(self, engine: "BaseSearchEngine") -> "BaseSearchEngine":
+        self._next_engine = engine
+        return engine
+
+    @abstractmethod
+    async def process(
+        self,
+        image_bytes: bytes,
+        filename: str,
+        content_type: str,
+        client: httpx.AsyncClient,
+    ) -> list[SearchResult]:
+        """Run this engine only; orchestration belongs to :meth:`search`."""
+        raise NotImplementedError
+
+    @staticmethod
+    def _best_similarity(results: list[SearchResult]) -> float:
+        return max((result.similarity for result in results), default=0.0)
+
+    async def search(
+        self,
+        image_bytes: bytes,
+        filename: str,
+        content_type: str,
+        client: httpx.AsyncClient,
+    ) -> list[SearchResult]:
+        """Run this node and continue through the chain when confidence is low."""
+        engine_name = type(self).__name__
+        logger.info("[%s] 开始处理", engine_name)
+        current_results: list[SearchResult] = []
+
+        try:
+            current_results = await self.process(
+                image_bytes=image_bytes,
+                filename=filename,
+                content_type=content_type,
+                client=client,
+            )
+        except UpstreamSearchError as exc:
+            if self._next_engine is None:
+                _chain_terminal_error.set(exc)
+                logger.error("[%s] 查询失败，已无后续引擎: %s", engine_name, exc)
+                return current_results
+            logger.info(
+                "[%s] process 抛出异常，流转至 %s: %s",
+                engine_name,
+                type(self._next_engine).__name__,
+                exc,
+            )
+            next_results = await self._next_engine.search(
+                image_bytes=image_bytes,
+                filename=filename,
+                content_type=content_type,
+                client=client,
+            )
+            return next_results or current_results
+
+        best_similarity = self._best_similarity(current_results)
+        if current_results and best_similarity >= TRACE_CONFIDENCE_THRESHOLD:
+            logger.info(
+                "[%s] 命中高置信度结果 (%.3f)", engine_name, best_similarity
+            )
+            return current_results
+
+        if self._next_engine is None:
+            if current_results:
+                logger.info("[%s] 已无后续引擎，返回当前结果作为兜底", engine_name)
+            return current_results
+
+        reason = "结果为空" if not current_results else f"置信度过低 ({best_similarity:.3f})"
+        logger.info(
+            "[%s] %s，流转至 %s",
+            engine_name,
+            reason,
+            type(self._next_engine).__name__,
+        )
+        next_results = await self._next_engine.search(
+            image_bytes=image_bytes,
+            filename=filename,
+            content_type=content_type,
+            client=client,
+        )
+        # Preserve the old behavior: if every later engine fails to produce a
+        # usable result, return the best low-confidence result from this node.
+        return next_results or current_results
+
+
+class TraceMoeEngine(BaseSearchEngine):
+    async def process(
+        self,
+        image_bytes: bytes,
+        filename: str,
+        content_type: str,
+        client: httpx.AsyncClient,
+    ) -> list[SearchResult]:
+        results, _ = await _request_tracemoe(
+            client, filename, image_bytes, content_type
+        )
+        return results
+
+
+class VisionLLMEngine(BaseSearchEngine):
+    async def process(
+        self,
+        image_bytes: bytes,
+        filename: str,
+        content_type: str,
+        client: httpx.AsyncClient,
+    ) -> list[SearchResult]:
+        result = await _request_llm_vision(client, image_bytes, content_type)
+        return [result]
+
+
+class SauceNaoEngine(BaseSearchEngine):
+    async def process(
+        self,
+        image_bytes: bytes,
+        filename: str,
+        content_type: str,
+        client: httpx.AsyncClient,
+    ) -> list[SearchResult]:
+        return await _request_saucenao(
+            client, filename, image_bytes, content_type
+        )

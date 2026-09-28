@@ -12,11 +12,24 @@ from config import (
     ALLOWED_CONTENT_TYPES,
     ALLOWED_EXTENSIONS,
     MAX_FILE_SIZE,
-    TRACE_CONFIDENCE_THRESHOLD,
     logger,
 )
-from schemas import SearchResponse, SearchResult, UpstreamSearchError
-from services import _request_llm_vision, _request_saucenao, _request_tracemoe
+from schemas import SearchResponse
+from services import (
+    BaseSearchEngine,
+    SauceNaoEngine,
+    TraceMoeEngine,
+    VisionLLMEngine,
+    get_chain_terminal_error,
+    get_trace_frame_count,
+    reset_search_context,
+)
+
+
+trace_moe_engine: BaseSearchEngine = TraceMoeEngine()
+vision_llm_engine: BaseSearchEngine = VisionLLMEngine()
+saucenao_engine: BaseSearchEngine = SauceNaoEngine()
+trace_moe_engine.set_next(vision_llm_engine).set_next(saucenao_engine)
 
 
 @asynccontextmanager
@@ -120,52 +133,29 @@ async def search_image(file: UploadFile = File(..., description="待识别的 JP
         )
 
     client: httpx.AsyncClient = app.state.http_client
-    trace_results: list[SearchResult] = []
-    frame_count: int | None = None
-    try:
-        trace_results, frame_count = await _request_tracemoe(
-            client, filename, contents, content_type
-        )
-    except UpstreamSearchError:
-        logger.info("Trace.moe unavailable; trying Vision LLM")
-
-    best_trace_similarity = max(
-        (result.similarity for result in trace_results), default=0.0
+    reset_search_context()
+    results = await trace_moe_engine.search(
+        image_bytes=contents,
+        filename=filename,
+        content_type=content_type,
+        client=client,
     )
-    if trace_results and best_trace_similarity >= TRACE_CONFIDENCE_THRESHOLD:
+
+    if results:
         return SearchResponse(
-            results=trace_results,
-            frameCount=frame_count,
-            engine="tracemoe",
+            results=results,
+            frameCount=get_trace_frame_count(),
+            engine=results[0].engine,
         )
 
-    try:
-        vision_result = await _request_llm_vision(client, contents, content_type)
-    except UpstreamSearchError as exc:
-        logger.info("Vision LLM unavailable or inconclusive; trying SauceNAO: %s", exc)
-    else:
-        return SearchResponse(results=[vision_result], engine="ai_vision")
-
-    try:
-        sauce_results = await _request_saucenao(
-            client, filename, contents, content_type
-        )
-    except UpstreamSearchError as exc:
-        logger.error("All three search engines failed: %s", exc)
+    terminal_error = get_chain_terminal_error()
+    if terminal_error is not None:
+        logger.error("All three search engines failed: %s", terminal_error)
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Trace.moe、Vision LLM 和 SauceNAO 均暂时不可用，请稍后重试或检查 API 配置。",
-        ) from exc
+        ) from terminal_error
 
-    if sauce_results:
-        return SearchResponse(results=sauce_results, engine="saucenao")
-
-    if trace_results:
-        return SearchResponse(
-            results=trace_results,
-            frameCount=frame_count,
-            engine="tracemoe",
-        )
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="三个识图引擎都没有找到可靠的匹配结果，请换一张更清晰的截图重试。",
