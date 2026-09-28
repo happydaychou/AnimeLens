@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f8fafc" />
+  <title>AnimeLens - 动漫精准识图</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Microsoft YaHei', 'sans-serif'] },
+          colors: { animePink: '#FF6699', animeBlue: '#00A1D6' },
+          boxShadow: {
+            soft: '0 12px 40px rgba(0, 161, 214, .10)',
+            pink: '0 12px 32px rgba(255, 102, 153, .20)'
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { background: #f8fafc; }
+    .anime-grid { background-image: linear-gradient(rgba(0, 161, 214, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 102, 153, .045) 1px, transparent 1px); background-size: 38px 38px; }
+    .float { animation: float 5s ease-in-out infinite; }
+    .float-slow { animation: float 7s ease-in-out infinite reverse; }
+    .shimmer { background: linear-gradient(90deg, #00A1D6, #FF6699, #00A1D6); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer 2.6s linear infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+    @keyframes shimmer { to { background-position: 200% center; } }
+    @keyframes pill { 0%, 100% { transform: scaleY(.65); opacity: .55; } 50% { transform: scaleY(1); opacity: 1; } }
+    .search-pill { animation: pill 1s ease-in-out infinite; }
+    .search-pill:nth-child(2) { animation-delay: .14s; }
+    .search-pill:nth-child(3) { animation-delay: .28s; }
+    .search-pill:nth-child(4) { animation-delay: .42s; }
+    video { background: #e0f2fe; }
+  </style>
+</head>
+<body class="min-h-screen overflow-x-hidden bg-slate-50 text-slate-700 antialiased">
+  <div class="pointer-events-none fixed inset-0 -z-10 anime-grid"></div>
+  <div class="pointer-events-none fixed -left-24 -top-24 -z-10 h-72 w-72 rounded-full bg-pink-200/50 blur-3xl"></div>
+  <div class="pointer-events-none fixed -bottom-32 -right-20 -z-10 h-96 w-96 rounded-full bg-sky-200/50 blur-3xl"></div>
+
+  <header class="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 lg:px-8">
+    <a href="/" class="group flex items-center gap-3" aria-label="AnimeLens 首页">
+      <div class="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-[#FF6699] to-[#00A1D6] text-xl font-black text-white shadow-pink transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">A</div>
+      <div>
+        <span class="block text-lg font-black tracking-tight text-slate-800">AnimeLens<span class="text-[#FF6699]">.</span></span>
+        <span class="block text-[10px] font-bold tracking-[.22em] text-[#00A1D6]">FIND YOUR ANIME</span>
+      </div>
+    </a>
+    <div class="hidden items-center gap-2 rounded-full border border-sky-100 bg-white px-4 py-2 text-xs font-semibold text-slate-500 shadow-sm sm:flex">
+      <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-400"></span>
+      三级级联在线检索
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-5 pb-20 lg:px-8">
+    <section class="mx-auto max-w-3xl pb-10 pt-10 text-center lg:pt-14">
+      <div class="float mb-6 inline-flex items-center gap-2 rounded-full border border-pink-200 bg-white px-4 py-2 text-xs font-bold text-[#FF6699] shadow-sm">
+        <span class="text-base">✦</span> 让每一帧都找到它的故事
+      </div>
+      <h1 class="text-4xl font-black leading-tight tracking-tight text-slate-800 sm:text-6xl">动漫精准识图 <span class="shimmer">(๑•̀ㅂ•́)و✧</span></h1>
+      <p class="mx-auto mt-5 max-w-xl text-base leading-7 text-slate-500 sm:text-lg">上传一张动漫截图，快速锁定番剧名称、集数与画面时间点。无需注册，马上开始探索你的二次元记忆。</p>
+    </section>
+
+    <section id="upload-section" class="mx-auto max-w-3xl">
+      <div id="drop-zone" class="group cursor-pointer rounded-2xl border border-sky-100 bg-white p-2 shadow-soft transition-transform duration-300 hover:scale-[1.02]">
+        <div class="rounded-xl border-2 border-dashed border-sky-200 bg-blue-50 px-6 py-14 text-center transition-colors duration-300 group-hover:border-[#FF6699] sm:px-12 sm:py-20">
+          <input id="file-input" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" class="hidden" />
+          <div class="float mx-auto mb-6 grid h-16 w-16 place-items-center rounded-2xl bg-white text-[#00A1D6] shadow-sm ring-1 ring-sky-100">
+            <svg aria-hidden="true" class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0L8 8m4-4 4 4M5 14.5v2.25A2.25 2.25 0 0 0 7.25 19h9.5A2.25 2.25 0 0 0 19 16.75V14.5" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.5 12.5h7" />
+            </svg>
+          </div>
+          <h2 class="text-xl font-black text-slate-800">把番剧截图拖到这里来吧~</h2>
+          <p class="mt-2 text-sm text-slate-500">或者 <span class="font-bold text-[#FF6699]">点击上传</span>，也可以直接粘贴截图</p>
+          <div class="mt-7 flex flex-wrap items-center justify-center gap-2 text-[11px] font-semibold text-slate-400">
+            <span class="rounded-full bg-white px-3 py-1.5 shadow-sm">JPG / PNG</span><span class="rounded-full bg-white px-3 py-1.5 shadow-sm">最大 10MB</span><span class="rounded-full bg-white px-3 py-1.5 shadow-sm">安全快速</span>
+          </div>
+        </div>
+      </div>
+      <p id="error-message" class="mt-4 hidden rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-center text-sm font-semibold text-rose-500"></p>
+    </section>
+
+    <section id="loading" class="mx-auto hidden max-w-3xl py-16 text-center">
+      <div class="mx-auto mb-6 flex h-16 items-center justify-center gap-1.5 rounded-2xl bg-white px-6 shadow-soft">
+        <span class="search-pill h-6 w-2 rounded-full bg-[#00A1D6]"></span><span class="search-pill h-8 w-2 rounded-full bg-sky-300"></span><span class="search-pill h-10 w-2 rounded-full bg-[#FF6699]"></span><span class="search-pill h-8 w-2 rounded-full bg-pink-300"></span>
+      </div>
+      <h2 class="shimmer text-xl font-black">正在跨次元检索中... 稍等哦~</h2>
+      <p class="mt-2 text-sm text-slate-400">正在穿越番剧数据库，寻找这一帧的出处</p>
+    </section>
+
+    <section id="results-section" class="mt-14 hidden">
+      <div class="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div><p class="mb-2 text-xs font-black uppercase tracking-[.2em] text-[#00A1D6]">Search results</p><h2 class="text-2xl font-black text-slate-800">识别结果 <span class="text-[#FF6699]">♡</span></h2></div>
+        <button id="reset-button" class="rounded-full border border-sky-100 bg-white px-5 py-2.5 text-sm font-bold text-slate-500 shadow-sm transition-all duration-300 hover:border-[#FF6699] hover:text-[#FF6699]">重新上传</button>
+      </div>
+      <div id="results-grid" class="grid gap-5 md:grid-cols-2"></div>
+    </section>
+  </main>
+
+  <footer class="border-t border-sky-100 bg-white/70 px-5 py-8 text-center text-xs font-medium text-slate-400">AnimeLens · Trace.moe + Vision LLM + SauceNAO 三级级联 · 仅供学习与探索使用</footer>
+
+  <script>
+    const dropZone = document.querySelector('#drop-zone');
+    const fileInput = document.querySelector('#file-input');
+    const loading = document.querySelector('#loading');
+    const resultsSection = document.querySelector('#results-section');
+    const resultsGrid = document.querySelector('#results-grid');
+    const errorMessage = document.querySelector('#error-message');
+    const resetButton = document.querySelector('#reset-button');
+
+    let currentImageUrl = null;
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+    const formatTime = (seconds) => { if (typeof seconds !== 'number') return '未知'; const mins = Math.floor(seconds / 60); const secs = Math.floor(seconds % 60).toString().padStart(2, '0'); return `${mins}:${secs}`; };
+    const getName = (title) => typeof title === 'string' ? title : (title?.chinese || title?.userPreferred || title?.romaji || title?.native || title?.english || '未知动漫');
+    const engineLabel = (engine) => engine === 'saucenao' ? 'SauceNAO 降级引擎' : engine === 'ai_vision' ? 'Vision AI 识别' : 'Trace.moe 主引擎';
+    const confidenceClass = (score) => score >= 90 ? 'border-pink-200 bg-pink-100 text-pink-600' : score >= 80 ? 'border-sky-200 bg-sky-100 text-sky-700' : 'border-slate-200 bg-slate-100 text-slate-500';
+    const engineClass = (engine) => engine === 'saucenao' ? 'bg-pink-100 text-pink-600 border-pink-200' : engine === 'ai_vision' ? 'bg-violet-100 text-violet-700 border-violet-200' : 'bg-sky-100 text-sky-700 border-sky-200';
+
+    function showError(message) { errorMessage.textContent = message; errorMessage.classList.remove('hidden'); }
+    function clearError() { errorMessage.classList.add('hidden'); errorMessage.textContent = ''; }
+    function setLoading(active) { loading.classList.toggle('hidden', !active); dropZone.classList.toggle('hidden', active); if (active) resultsSection.classList.add('hidden'); }
+
+    function renderResults(results) {
+      resultsGrid.innerHTML = '';
+      if (!results.length) { resultsGrid.innerHTML = '<div class="col-span-full rounded-2xl border border-sky-100 bg-white p-10 text-center font-semibold text-slate-400 shadow-sm">没有找到匹配结果，换一张更清晰的截图试试吧。</div>'; resultsSection.classList.remove('hidden'); return; }
+      results.forEach((result) => {
+        const score = typeof result.similarity === 'number' ? (result.similarity <= 1 ? result.similarity * 100 : result.similarity) : 0;
+        const highScore = score >= 85;
+        const confidenceTone = confidenceClass(score);
+        const title = getName(result.title);
+        const engine = result.engine || 'tracemoe';
+        const subtitle = typeof result.title === 'object' ? [result.title?.romaji, result.title?.native].filter((name) => name && name !== title).join(' · ') : '';
+        const fallbackUrl = currentImageUrl || '';
+        const primaryImage = result.image_url || result.thumbnail_url || fallbackUrl;
+        const fallbackAttribute = fallbackUrl && primaryImage !== fallbackUrl ? `data-fallback="${escapeHtml(fallbackUrl)}"` : '';
+        const imageMarkup = result.video_url
+          ? `<video class="h-full w-full object-cover" controls preload="metadata" playsinline src="${escapeHtml(result.video_url)}" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')"></video><div class="hidden absolute inset-0">${fallbackUrl ? `<img class="h-full w-full object-cover" src="${escapeHtml(fallbackUrl)}" alt="${escapeHtml(title)} 原图" />` : '<div class="grid h-full place-items-center bg-slate-200 px-6 text-center text-sm font-semibold text-slate-500">视频预览暂时无法加载</div>'}</div>`
+          : primaryImage
+            ? `<img class="h-full w-full object-cover" src="${escapeHtml(primaryImage)}" ${fallbackAttribute} alt="${escapeHtml(title)} 识别图片" loading="lazy" onerror="this.dataset.fallback && this.src !== this.dataset.fallback ? (this.src = this.dataset.fallback) : (this.onerror = null, this.classList.add('hidden'), this.nextElementSibling.classList.remove('hidden'))"><div class="hidden absolute inset-0 grid place-items-center bg-slate-200/90 px-6 text-center text-sm font-semibold text-slate-500"><span>图片预览暂时无法加载<br><span class="mt-1 inline-block text-xs font-normal text-slate-400">仍然可以参考下方识别信息</span></span></div>`
+            : '<div class="absolute inset-0 grid place-items-center bg-slate-200 px-6 text-center text-sm font-semibold text-slate-500"><span>暂无图片预览<br><span class="mt-1 inline-block text-xs font-normal text-slate-400">仍然可以参考下方识别信息</span></span></div>';
+        const visionDetails = engine === 'ai_vision' && (result.character || result.description)
+          ? `<div class="mt-4 rounded-xl border border-violet-100 bg-violet-50/70 p-3"><p class="text-[11px] font-black uppercase tracking-[.15em] text-violet-500">AI 识别细节</p>${result.character ? `<p class="mt-2 text-sm font-bold text-slate-700">角色：${escapeHtml(result.character)}</p>` : ''}${result.description ? `<p class="mt-1 text-xs leading-5 text-slate-500">${escapeHtml(result.description)}</p>` : ''}</div>`
+          : '';
+        const card = document.createElement('article');
+        card.className = 'overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg';
+        card.innerHTML = `<div class="relative aspect-video overflow-hidden bg-sky-50">${imageMarkup}<div class="absolute left-3 top-3 rounded-full border px-3 py-1 text-xs font-black shadow-sm backdrop-blur ${confidenceTone}">${score.toFixed(1)}% 置信度</div><div class="absolute right-3 top-3 rounded-full border px-2.5 py-1 text-[11px] font-bold shadow-sm backdrop-blur ${engineClass(engine)}">${engineLabel(engine)}</div></div><div class="p-5"><h3 class="line-clamp-2 text-lg font-black text-slate-800">${escapeHtml(title)}</h3><p class="mt-1 min-h-5 text-xs text-slate-400">${escapeHtml(subtitle)}</p>${visionDetails}<div class="mt-5 grid grid-cols-2 gap-3 text-sm"><div class="rounded-xl bg-sky-50 p-3"><p class="text-[11px] font-semibold text-sky-500">集数</p><p class="mt-1 font-bold text-slate-700">${result.episode ? `第 ${escapeHtml(result.episode)} 集` : '未知'}</p></div><div class="rounded-xl bg-pink-50 p-3"><p class="text-[11px] font-semibold text-pink-500">画面时间</p><p class="mt-1 font-bold text-slate-700">${formatTime(result.from)} - ${formatTime(result.to)}</p></div></div></div>`;
+        resultsGrid.appendChild(card);
+      });
+      resultsSection.classList.remove('hidden');
+    }
+
+    async function search(file) {
+      clearError();
+      if (!file) return;
+      if (!['image/jpeg', 'image/png'].includes(file.type)) return showError('仅支持 JPG/JPEG 和 PNG 图片。');
+      if (file.size > 10 * 1024 * 1024) return showError('图片大小不能超过 10MB。');
+      if (currentImageUrl) URL.revokeObjectURL(currentImageUrl);
+      currentImageUrl = URL.createObjectURL(file);
+      setLoading(true);
+      try {
+        const formData = new FormData(); formData.append('file', file);
+        const response = await fetch('/api/search', { method: 'POST', body: formData });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || '识图失败，请稍后重试。');
+        renderResults(data.results || []);
+      } catch (error) { showError(error.message || '网络异常，请检查后端服务是否启动。'); }
+      finally { setLoading(false); }
+    }
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (event) => search(event.target.files[0]));
+    ['dragenter', 'dragover'].forEach((eventName) => dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.add('border-[#FF6699]'); }));
+    ['dragleave', 'drop'].forEach((eventName) => dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.remove('border-[#FF6699]'); }));
+    dropZone.addEventListener('drop', (event) => search(event.dataTransfer.files[0]));
+    document.addEventListener('paste', (event) => { const image = [...(event.clipboardData?.items || [])].find((item) => item.type.startsWith('image/')); if (image) search(image.getAsFile()); });
+    resetButton.addEventListener('click', () => { resultsSection.classList.add('hidden'); fileInput.value = ''; clearError(); if (currentImageUrl) { URL.revokeObjectURL(currentImageUrl); currentImageUrl = null; } window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  </script>
+</body>
+</html>
