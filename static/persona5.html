@@ -166,46 +166,78 @@
     const errorMessage = document.querySelector('#error-message');
     const resetButton = document.querySelector('#reset-button');
 
+    let currentImageUrl = null;
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+    const getName = (title) => typeof title === 'string' ? title : (title?.chinese || title?.userPreferred || title?.romaji || title?.native || title?.english || '未知动漫');
+    const formatTime = (seconds) => {
+      const numeric = Number(seconds);
+      if (!Number.isFinite(numeric) || numeric < 0) return '未知';
+      const mins = Math.floor(numeric / 60);
+      const secs = Math.floor(numeric % 60).toString().padStart(2, '0');
+      return `${mins}:${secs}`;
+    };
+    const getScore = (similarity) => {
+      const numeric = Number(similarity);
+      if (!Number.isFinite(numeric)) return 0;
+      return Math.max(0, Math.min(numeric <= 1 ? numeric * 100 : numeric, 100));
+    };
+    const engineLabel = (engine) => engine === 'saucenao' ? 'SAUCENAO // FALLBACK' : engine === 'ai_vision' ? 'VISION AI // ANALYSIS' : 'TRACE.MOE // FRAME';
+    const engineTone = (engine) => engine === 'saucenao' ? 'bg-white text-black' : engine === 'ai_vision' ? 'bg-black text-white' : 'bg-red-600 text-white';
+    const scoreTone = (score) => score >= 85 ? 'bg-red-600 text-white' : score >= 70 ? 'bg-white text-black' : 'bg-black text-white';
+
     function showError(message) { errorMessage.textContent = message; errorMessage.classList.remove('hidden'); }
     function clearError() { errorMessage.classList.add('hidden'); errorMessage.textContent = ''; }
     function setLoading(active) { loading.classList.toggle('hidden', !active); dropZone.classList.toggle('hidden', active); if (active) resultsSection.classList.add('hidden'); }
-    function renderResults(results) { resultsGrid.innerHTML = results.map((result) => `<article class="border-4 border-black bg-white p-5 text-black shadow-hard"><h3 class="text-2xl font-black uppercase">${String(result.title || '未知动漫')}</h3><p class="mt-2 font-black">${result.description || ''}</p></article>`).join(''); resultsSection.classList.remove('hidden'); }
-    
-    // function renderResults(results) {
-    //   resultsGrid.innerHTML = '';
-    //   if (!results.length) { resultsGrid.innerHTML = '<div class="col-span-full rounded-2xl border border-sky-100 bg-white p-10 text-center font-semibold text-slate-400 shadow-sm">没有找到匹配结果，换一张更清晰的截图试试吧。</div>'; resultsSection.classList.remove('hidden'); return; }
-    //   results.forEach((result) => {
-    //     const score = typeof result.similarity === 'number' ? (result.similarity <= 1 ? result.similarity * 100 : result.similarity) : 0;
-    //     const highScore = score >= 85;
-    //     const confidenceTone = confidenceClass(score);
-    //     const title = getName(result.title);
-    //     const engine = result.engine || 'tracemoe';
-    //     const subtitle = typeof result.title === 'object' ? [result.title?.romaji, result.title?.native].filter((name) => name && name !== title).join(' · ') : '';
-    //     const fallbackUrl = currentImageUrl || '';
-    //     const primaryImage = result.image_url || result.thumbnail_url || fallbackUrl;
-    //     const fallbackAttribute = fallbackUrl && primaryImage !== fallbackUrl ? `data-fallback="${escapeHtml(fallbackUrl)}"` : '';
-    //     const imageMarkup = result.video_url
-    //       ? `<video class="h-full w-full object-cover" controls preload="metadata" playsinline src="${escapeHtml(result.video_url)}" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')"></video><div class="hidden absolute inset-0">${fallbackUrl ? `<img class="h-full w-full object-cover" src="${escapeHtml(fallbackUrl)}" alt="${escapeHtml(title)} 原图" />` : '<div class="grid h-full place-items-center bg-slate-200 px-6 text-center text-sm font-semibold text-slate-500">视频预览暂时无法加载</div>'}</div>`
-    //       : primaryImage
-    //         ? `<img class="h-full w-full object-cover" src="${escapeHtml(primaryImage)}" ${fallbackAttribute} alt="${escapeHtml(title)} 识别图片" loading="lazy" onerror="this.dataset.fallback && this.src !== this.dataset.fallback ? (this.src = this.dataset.fallback) : (this.onerror = null, this.classList.add('hidden'), this.nextElementSibling.classList.remove('hidden'))"><div class="hidden absolute inset-0 grid place-items-center bg-slate-200/90 px-6 text-center text-sm font-semibold text-slate-500"><span>图片预览暂时无法加载<br><span class="mt-1 inline-block text-xs font-normal text-slate-400">仍然可以参考下方识别信息</span></span></div>`
-    //         : '<div class="absolute inset-0 grid place-items-center bg-slate-200 px-6 text-center text-sm font-semibold text-slate-500"><span>暂无图片预览<br><span class="mt-1 inline-block text-xs font-normal text-slate-400">仍然可以参考下方识别信息</span></span></div>';
-    //     const visionDetails = engine === 'ai_vision' && (result.character || result.description)
-    //       ? `<div class="mt-4 rounded-xl border border-violet-100 bg-violet-50/70 p-3"><p class="text-[11px] font-black uppercase tracking-[.15em] text-violet-500">AI 识别细节</p>${result.character ? `<p class="mt-2 text-sm font-bold text-slate-700">角色：${escapeHtml(result.character)}</p>` : ''}${result.description ? `<p class="mt-1 text-xs leading-5 text-slate-500">${escapeHtml(result.description)}</p>` : ''}</div>`
-    //       : '';
-    //     const card = document.createElement('article');
-    //     card.className = 'overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg';
-    //     card.innerHTML = `<div class="relative aspect-video overflow-hidden bg-sky-50">${imageMarkup}<div class="absolute left-3 top-3 rounded-full border px-3 py-1 text-xs font-black shadow-sm backdrop-blur ${confidenceTone}">${score.toFixed(1)}% 置信度</div><div class="absolute right-3 top-3 rounded-full border px-2.5 py-1 text-[11px] font-bold shadow-sm backdrop-blur ${engineClass(engine)}">${engineLabel(engine)}</div></div><div class="p-5"><h3 class="line-clamp-2 text-lg font-black text-slate-800">${escapeHtml(title)}</h3><p class="mt-1 min-h-5 text-xs text-slate-400">${escapeHtml(subtitle)}</p>${visionDetails}<div class="mt-5 grid grid-cols-2 gap-3 text-sm"><div class="rounded-xl bg-sky-50 p-3"><p class="text-[11px] font-semibold text-sky-500">集数</p><p class="mt-1 font-bold text-slate-700">${result.episode ? `第 ${escapeHtml(result.episode)} 集` : '未知'}</p></div><div class="rounded-xl bg-pink-50 p-3"><p class="text-[11px] font-semibold text-pink-500">画面时间</p><p class="mt-1 font-bold text-slate-700">${formatTime(result.from)} - ${formatTime(result.to)}</p></div></div></div>`;
-    //     resultsGrid.appendChild(card);
-    //   });
-    //   resultsSection.classList.remove('hidden');
-    // }
-    
+
+    function renderResults(results) {
+      resultsGrid.innerHTML = '';
+      if (!results.length) {
+        resultsGrid.innerHTML = '<div class="col-span-full border-4 border-black bg-white p-10 text-center font-black text-black shadow-hard"><p class="text-2xl uppercase">没有找到匹配结果</p><p class="mt-3 text-sm font-bold">换一张更清晰的截图，再发动一次检索。</p></div>';
+        resultsSection.classList.remove('hidden');
+        return;
+      }
+
+      results.forEach((result, index) => {
+        const score = getScore(result.similarity);
+        const title = getName(result.title);
+        const engine = result.engine || 'tracemoe';
+        const subtitle = typeof result.title === 'object'
+          ? [result.title?.romaji, result.title?.native, result.title?.english].filter((name) => name && name !== title).join(' // ')
+          : '';
+        const fallbackUrl = currentImageUrl || '';
+        const primaryImage = result.image_url || result.thumbnail_url || fallbackUrl;
+        const fallbackAttribute = fallbackUrl && primaryImage !== fallbackUrl ? `data-fallback="${escapeHtml(fallbackUrl)}"` : '';
+        const fallbackPanel = fallbackUrl
+          ? `<img class="h-full w-full object-cover" src="${escapeHtml(fallbackUrl)}" alt="${escapeHtml(title)} 原图" />`
+          : '<div class="grid h-full place-items-center px-6 text-center text-sm font-black text-white">预览不可用<br /><span class="mt-2 text-xs font-bold text-red-300">仍可参考识别信息</span></div>';
+        const imageMarkup = result.video_url
+          ? `<video class="h-full w-full object-cover" controls preload="metadata" playsinline src="${escapeHtml(result.video_url)}" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')"></video><div class="absolute inset-0 hidden">${fallbackPanel}</div>`
+          : primaryImage
+            ? `<img class="h-full w-full object-cover" src="${escapeHtml(primaryImage)}" ${fallbackAttribute} alt="${escapeHtml(title)} 识别图片" loading="lazy" onerror="this.dataset.fallback && this.src !== this.dataset.fallback ? (this.src = this.dataset.fallback) : (this.onerror = null, this.classList.add('hidden'), this.nextElementSibling.classList.remove('hidden'))"><div class="absolute inset-0 hidden bg-black">${fallbackPanel}</div>`
+            : '<div class="absolute inset-0 grid place-items-center bg-black px-6 text-center text-sm font-black text-white">暂无图片预览<br /><span class="mt-2 text-xs font-bold text-red-300">仍可参考识别信息</span></div>';
+        const episode = result.episode !== null && result.episode !== undefined && result.episode !== '' ? `第 ${escapeHtml(result.episode)} 集` : '未知';
+        const fromTime = result.from ?? result.from_;
+        const toTime = result.to ?? result.to_;
+        const timeRange = fromTime !== null && fromTime !== undefined ? `${formatTime(fromTime)}${toTime !== null && toTime !== undefined ? ` — ${formatTime(toTime)}` : ''}` : '未知';
+        const visionDetails = engine === 'ai_vision' && (result.character || result.description)
+          ? `<div class="mt-5 border-4 border-black bg-red-600 p-3 text-black shadow-hard"><p class="text-[11px] font-black uppercase tracking-[.15em]">AI // 识别细节</p>${result.character ? `<p class="mt-2 text-sm font-black">角色：${escapeHtml(result.character)}</p>` : ''}${result.description ? `<p class="mt-2 text-xs font-bold leading-5">${escapeHtml(result.description)}</p>` : ''}</div>`
+          : '';
+        const card = document.createElement('article');
+        card.className = 'group overflow-hidden border-4 border-black bg-white text-black shadow-hard transition-transform duration-200 hover:-translate-y-1';
+        card.innerHTML = `<div class="relative aspect-video overflow-hidden border-b-4 border-black bg-black">${imageMarkup}<div class="absolute left-3 top-3 -rotate-3 border-2 border-black px-3 py-1 text-xs font-black uppercase shadow-hard ${scoreTone(score)}">${score.toFixed(1)}% CONFIDENCE</div><div class="absolute right-3 top-3 rotate-2 border-2 border-black px-2.5 py-1 text-[10px] font-black uppercase shadow-hard ${engineTone(engine)}">${engineLabel(engine)}</div></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><p class="-rotate-2 bg-black px-2 py-1 text-[10px] font-black uppercase tracking-[.15em] text-white">Target // ${(index + 1).toString().padStart(2, '0')}</p><span class="h-2 w-2 rotate-45 bg-red-600"></span></div><h3 class="text-2xl font-black uppercase leading-tight tracking-[-.05em]">${escapeHtml(title)}</h3><p class="mt-2 min-h-5 text-xs font-bold uppercase text-red-600">${escapeHtml(subtitle || 'IDENTITY CONFIRMED // SOURCE LOCATED')}</p>${visionDetails}<div class="mt-5 grid grid-cols-2 gap-3 text-sm"><div class="border-2 border-black bg-black p-3 text-white"><p class="text-[10px] font-black uppercase tracking-[.15em] text-red-400">Episode</p><p class="mt-2 font-black">${episode}</p></div><div class="border-2 border-black bg-red-600 p-3 text-black"><p class="text-[10px] font-black uppercase tracking-[.15em]">Frame time</p><p class="mt-2 font-black">${timeRange}</p></div></div></div>`;
+        resultsGrid.appendChild(card);
+      });
+      resultsSection.classList.remove('hidden');
+    }
 
     async function search(file) {
       clearError();
       if (!file) return;
       if (!['image/jpeg', 'image/png'].includes(file.type)) return showError('仅支持 JPG/JPEG 和 PNG 图片。');
       if (file.size > 10 * 1024 * 1024) return showError('图片大小不能超过 10MB。');
+      if (currentImageUrl) URL.revokeObjectURL(currentImageUrl);
+      currentImageUrl = URL.createObjectURL(file);
       setLoading(true);
       try {
         const formData = new FormData(); formData.append('file', file);
@@ -223,7 +255,7 @@
     ['dragleave', 'drop'].forEach((eventName) => dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.remove('ring-8', 'ring-white'); }));
     dropZone.addEventListener('drop', (event) => search(event.dataTransfer.files[0]));
     document.addEventListener('paste', (event) => { const image = [...(event.clipboardData?.items || [])].find((item) => item.type.startsWith('image/')); if (image) search(image.getAsFile()); });
-    resetButton.addEventListener('click', () => { resultsSection.classList.add('hidden'); fileInput.value = ''; clearError(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    resetButton.addEventListener('click', () => { resultsSection.classList.add('hidden'); fileInput.value = ''; clearError(); if (currentImageUrl) { URL.revokeObjectURL(currentImageUrl); currentImageUrl = null; } window.scrollTo({ top: 0, behavior: 'smooth' }); });
   </script>
 </body>
 </html>
