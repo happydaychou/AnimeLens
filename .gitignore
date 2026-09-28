@@ -1,0 +1,14 @@
+# 依赖目录和虚拟环境
+venv/
+env/
+
+# Python 缓存文件
+__pycache__/
+*.py[cod]
+
+# 包含敏感信息的环境变量配置
+.env
+
+# IDE 或编辑器的配置文件
+.vscode/
+.cursorrules
