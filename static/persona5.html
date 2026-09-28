@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000000" />
+  <title>AnimeLens // Calling Card</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Arial Black', 'Inter', 'ui-sans-serif', 'system-ui', 'Microsoft YaHei', 'sans-serif']
+          },
+          boxShadow: {
+            card: '8px 8px 0 0 rgba(0,0,0,1)',
+            cardHover: '16px 16px 0 0 rgba(0,0,0,1)',
+            hard: '5px 5px 0 0 rgba(0,0,0,1)'
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #000; font-family: 'Arial Black', 'Inter', 'Microsoft YaHei', sans-serif; }
+    .paper-cut { box-shadow: 5px 5px 0 #000; }
+    .slash-text { writing-mode: vertical-rl; text-orientation: mixed; }
+    .halftone {
+      background-image: radial-gradient(#fff 1px, transparent 1px);
+      background-size: 8px 8px;
+    }
+    .red-stripe {
+      background: repeating-linear-gradient(-45deg, #dc2626 0 12px, #000 12px 18px);
+    }
+    .calling-card:hover ~ .joker-mascot,
+    .calling-card:focus-within ~ .joker-mascot {
+      transform: translateY(0) rotate(-4deg);
+    }
+    .joker-mascot { transform: translateY(42%) rotate(-4deg); transition: transform .45s cubic-bezier(.2,.9,.25,1.2); }
+    @media (max-width: 768px) {
+      .joker-mascot { opacity: .32; transform: translateY(45%) rotate(-4deg) scale(.76); transform-origin: bottom right; }
+      .calling-card:hover ~ .joker-mascot,
+      .calling-card:focus-within ~ .joker-mascot { opacity: .7; transform: translateY(5%) rotate(-4deg) scale(.76); }
+    }
+  </style>
+</head>
+<body class="min-h-screen overflow-x-hidden bg-black text-white antialiased selection:bg-white selection:text-red-600">
+  <div class="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -left-24 top-16 h-36 w-[125%] -rotate-12 bg-red-600 opacity-90"></div>
+    <div class="absolute -right-40 top-[38%] h-24 w-[110%] rotate-[19deg] bg-red-600"></div>
+    <div class="absolute -left-40 bottom-10 h-40 w-[120%] -rotate-[8deg] border-y-8 border-black bg-red-600"></div>
+    <div class="absolute right-8 top-0 h-full w-16 -skew-x-12 bg-white/5"></div>
+    <div class="absolute inset-y-0 left-[12%] w-px bg-red-600/50"></div>
+    <div class="absolute inset-y-0 right-[18%] w-px bg-white/20"></div>
+  </div>
+
+  <header class="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-7 lg:px-12">
+    <a href="#top" class="group inline-flex items-center gap-3" aria-label="AnimeLens 首页">
+      <span class="grid h-12 w-12 rotate-3 place-items-center border-4 border-black bg-white text-3xl font-black text-black shadow-hard transition-transform group-hover:-rotate-6">A</span>
+      <span class="text-xl font-black uppercase tracking-[-.08em] text-white">Anime<span class="text-red-600">Lens</span></span>
+    </a>
+    <div class="hidden -rotate-2 border-2 border-white bg-black px-4 py-2 text-xs font-black uppercase tracking-[.25em] text-white sm:block">The calling card // 001</div>
+  </header>
+
+  <main id="top" class="relative z-10 mx-auto max-w-7xl px-6 pb-32 lg:px-12">
+    <section class="relative mx-auto max-w-6xl pb-14 pt-10 lg:pt-20">
+      <div class="absolute -left-5 top-0 hidden -rotate-90 text-xs font-black uppercase tracking-[.5em] text-white/70 lg:block">Take your anime heart</div>
+      <div class="mb-8 flex flex-wrap items-end gap-3 text-[clamp(3rem,10vw,8.5rem)] font-black leading-[.78] tracking-[-.12em] uppercase">
+        <span class="paper-cut -rotate-2 bg-white px-3 py-4 text-black">动</span>
+        <span class="paper-cut rotate-2 bg-black px-3 py-4 text-white outline outline-4 outline-white">漫</span>
+        <span class="paper-cut -rotate-1 bg-red-600 px-3 py-4 text-white">精</span>
+        <span class="paper-cut rotate-3 bg-white px-3 py-4 text-black">准</span>
+        <span class="paper-cut -rotate-2 bg-black px-3 py-4 text-white outline outline-4 outline-white">识</span>
+        <span class="paper-cut rotate-1 bg-red-600 px-3 py-4 text-white">图</span>
+      </div>
+      <div class="ml-auto flex max-w-3xl -skew-x-12 items-center border-4 border-red-600 bg-black px-6 py-5 shadow-hard md:px-10">
+        <p class="skew-x-12 text-base font-black leading-7 text-white md:text-xl">上传一张动漫截图，揭开它来自哪一个世界。<span class="ml-2 text-red-600">// NO REGISTRATION. NO MERCY.</span></p>
+      </div>
+      <div class="mt-8 flex items-center gap-4">
+        <span class="h-1 w-24 bg-white"></span>
+        <span class="-rotate-3 text-sm font-black uppercase tracking-[.35em] text-white">TAKE YOUR ANIME HEART</span>
+        <span class="h-1 flex-1 bg-red-600"></span>
+      </div>
+    </section>
+
+    <section class="relative mx-auto max-w-5xl">
+      <div class="absolute -right-4 -top-8 z-20 rotate-6 bg-white px-4 py-2 text-sm font-black uppercase text-black shadow-hard">Evidence // image file</div>
+      <div id="drop-zone" class="calling-card group cursor-pointer -rotate-2 border-4 border-black bg-red-600 p-3 shadow-card transition-all duration-300 hover:-translate-y-2 hover:rotate-0 hover:shadow-cardHover focus-within:-translate-y-2 focus-within:rotate-0">
+        <div class="border-4 border-black bg-red-600 px-6 py-14 text-center md:px-16 md:py-24">
+          <input id="file-input" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" class="hidden" />
+          <div class="mx-auto mb-8 max-w-3xl text-[clamp(2rem,6vw,5rem)] font-black uppercase leading-[.82] tracking-[-.1em] text-black">
+            <span class="mr-2 inline-block -rotate-2 bg-white px-3 py-2 shadow-hard">把</span>
+            <span class="mr-2 inline-block rotate-1 bg-black px-3 py-2 text-white shadow-hard">番</span>
+            <span class="mr-2 inline-block -rotate-1 bg-white px-3 py-2 shadow-hard">剧</span>
+            <span class="mr-2 inline-block rotate-2 bg-black px-3 py-2 text-white shadow-hard">截</span>
+            <span class="mr-2 inline-block -rotate-2 bg-white px-3 py-2 shadow-hard">图</span>
+            <span class="mr-2 inline-block rotate-1 bg-black px-3 py-2 text-white shadow-hard">拖</span>
+            <span class="mr-2 inline-block -rotate-1 bg-white px-3 py-2 shadow-hard">到</span>
+            <span class="mr-2 inline-block rotate-2 bg-black px-3 py-2 text-white shadow-hard">这</span>
+            <span class="mr-2 inline-block -rotate-2 bg-white px-3 py-2 shadow-hard">里</span>
+          </div>
+          <p class="mx-auto max-w-2xl border-y-4 border-black py-4 text-lg font-black uppercase text-black md:text-2xl">或者点击上传 // 也可以直接粘贴截图</p>
+          <div class="mt-8 flex flex-wrap justify-center gap-3 text-xs font-black uppercase text-black">
+            <span class="bg-white px-4 py-2 shadow-hard">JPG / PNG</span>
+            <span class="bg-black px-4 py-2 text-white shadow-hard">MAX 10MB</span>
+            <span class="bg-white px-4 py-2 shadow-hard">SECURE FILE</span>
+          </div>
+        </div>
+      </div>
+      <p id="error-message" class="mt-8 hidden border-4 border-white bg-black px-5 py-4 text-center text-sm font-black text-white shadow-hard"></p>
+    </section>
+
+    <section id="loading" class="mx-auto hidden max-w-5xl py-20 text-center">
+      <div class="red-stripe mx-auto mb-8 h-12 w-56 -skew-x-12 border-4 border-black"></div>
+      <h2 class="text-3xl font-black uppercase tracking-[-.05em] text-white md:text-5xl">Searching the Metaverse...</h2>
+      <p class="mt-4 text-sm font-black uppercase tracking-[.25em] text-red-600">No heart remains unidentified</p>
+    </section>
+
+    <section id="results-section" class="mt-20 hidden">
+      <div class="mb-8 flex flex-wrap items-end justify-between gap-4 border-b-4 border-white pb-5">
+        <div><p class="text-xs font-black uppercase tracking-[.35em] text-red-600">Target acquired</p><h2 class="mt-2 text-4xl font-black uppercase tracking-[-.08em] md:text-6xl">识别结果 // Results</h2></div>
+        <button id="reset-button" class="-rotate-2 border-4 border-black bg-white px-6 py-3 text-sm font-black uppercase text-black shadow-hard transition hover:rotate-0 hover:bg-red-600">重新上传</button>
+      </div>
+      <div id="results-grid" class="grid gap-8 md:grid-cols-2"></div>
+    </section>
+  </main>
+
+  <div class="joker-mascot pointer-events-none fixed bottom-0 right-0 z-30 w-56 md:w-80" aria-label="怪盗吉祥物占位">
+    <img src="/static/joker.png" alt="Joker" class="h-auto w-full drop-shadow-[12px_12px_0_rgba(220,38,38,1)]" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden')" />
+    <div class="hidden border-4 border-black bg-white p-4 text-center text-black shadow-hard"><span class="text-3xl">?</span><br /><span class="text-xs font-black uppercase">joker.png not found</span></div>
+  </div>
+
+  <script>
+    const dropZone = document.querySelector('#drop-zone');
+    const fileInput = document.querySelector('#file-input');
+    const loading = document.querySelector('#loading');
+    const resultsSection = document.querySelector('#results-section');
+    const resultsGrid = document.querySelector('#results-grid');
+    const errorMessage = document.querySelector('#error-message');
+    const resetButton = document.querySelector('#reset-button');
+
+    function showError(message) { errorMessage.textContent = message; errorMessage.classList.remove('hidden'); }
+    function clearError() { errorMessage.classList.add('hidden'); errorMessage.textContent = ''; }
+    function setLoading(active) { loading.classList.toggle('hidden', !active); dropZone.classList.toggle('hidden', active); if (active) resultsSection.classList.add('hidden'); }
+    function renderResults(results) { resultsGrid.innerHTML = results.map((result) => `<article class="border-4 border-black bg-white p-5 text-black shadow-hard"><h3 class="text-2xl font-black uppercase">${String(result.title || '未知动漫')}</h3><p class="mt-2 font-black">${result.description || ''}</p></article>`).join(''); resultsSection.classList.remove('hidden'); }
+
+    async function search(file) {
+      clearError();
+      if (!file) return;
+      if (!['image/jpeg', 'image/png'].includes(file.type)) return showError('仅支持 JPG/JPEG 和 PNG 图片。');
+      if (file.size > 10 * 1024 * 1024) return showError('图片大小不能超过 10MB。');
+      setLoading(true);
+      try {
+        const formData = new FormData(); formData.append('file', file);
+        const response = await fetch('/api/search', { method: 'POST', body: formData });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || '识图失败，请稍后重试。');
+        renderResults(data.results || []);
+      } catch (error) { showError(error.message || '网络异常，请检查后端服务是否启动。'); }
+      finally { setLoading(false); }
+    }
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (event) => search(event.target.files[0]));
+    ['dragenter', 'dragover'].forEach((eventName) => dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.add('ring-8', 'ring-white'); }));
+    ['dragleave', 'drop'].forEach((eventName) => dropZone.addEventListener(eventName, (event) => { event.preventDefault(); dropZone.classList.remove('ring-8', 'ring-white'); }));
+    dropZone.addEventListener('drop', (event) => search(event.dataTransfer.files[0]));
+    document.addEventListener('paste', (event) => { const image = [...(event.clipboardData?.items || [])].find((item) => item.type.startsWith('image/')); if (image) search(image.getAsFile()); });
+    resetButton.addEventListener('click', () => { resultsSection.classList.add('hidden'); fileInput.value = ''; clearError(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  </script>
+</body>
+</html>
